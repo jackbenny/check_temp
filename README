@@ -1,0 +1,10 @@
+check_temp
+
+A small Nagios plugin that checks the CPU (or M/B) temperature with lm-sensors.
+It's written in Bash and uses some sed & awk.
+Default is to check the CPU temperature but this can be changed to for example 
+the motherboard temperature with a "--sensor" argument. 
+The plugin complies with the guidelines, for example uses -w -c -v arguments 
+etc. It also does some basic sanity checks and has a exit 3 catchall.
+
+The plugin were submitted to Nagios Exchange in 2011.
