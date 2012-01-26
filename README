@@ -8,3 +8,8 @@ The plugin complies with the guidelines, for example uses -w -c -v arguments
 etc. It also does some basic sanity checks and has a exit 3 catchall.
 
 The plugin were submitted to Nagios Exchange in 2011.
+
+Known forks of check_temp:
+There is a very good Perl fork of check_temp written by Chad Columbus. It's
+avalible on Nagios Exchange at
+http://exchange.nagios.org/directory/Plugins/Operating-Systems/Linux/check_temp-2Epl/details
