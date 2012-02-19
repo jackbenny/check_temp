@@ -29,7 +29,7 @@
 # Version 0.5: Line 162, fixed a typo (EXIT_UNKNOWN to STATE_UNKNOWN)         #
 ###############################################################################
 
-VERSION="Version 0.5"
+VERSION="Version 0.6"
 AUTHOR="(c) 2011 Jack-Benny Persson (jack-benny@cyberinfo.se)"
 
 # Sensor program
@@ -150,7 +150,7 @@ while [[ -n "$1" ]]; do
 	   shift 2
            ;;
 
-       -?)
+       -\?)
            print_help
            exit $STATE_OK
            ;;
