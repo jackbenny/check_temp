@@ -215,21 +215,24 @@ ${SENSORPROG} | grep "Temp"
 printf "\n\n"
 fi
 
+# Get performance data for Nagios "Performance Data" field
+PERFDATA=`${SENSORPROG} | grep "$sensor"`
+
 
 # And finally check the temperature against our thresholds
 if [[ "$TEMP" -gt "$thresh_crit" ]]; then
 	# Temperature is above critical threshold
-	echo "$sensor CRITICAL - Temperature is $TEMP"
+	echo "$sensor CRITICAL - Temperature is $TEMP | $PERFDATA"
 	exit $STATE_CRITICAL
 
   elif [[ "$TEMP" -gt "$thresh_warn" ]]; then
 	# Temperature is above warning threshold
-	echo "$sensor WARNING - Temperature is $TEMP"
+	echo "$sensor WARNING - Temperature is $TEMP | $PERFDATA"
 	exit $STATE_WARNING
 
   else
 	# Temperature is ok
-	echo "$sensor OK - Temperature is $TEMP"
+	echo "$sensor OK - Temperature is $TEMP | $PERFDATA"
 	exit $STATE_OK
 fi
 exit 3
