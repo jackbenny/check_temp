@@ -27,9 +27,13 @@
 # Version 0.2: Line 98, fixed the missing "-n" option (Thanks to Chad who     #
 # pointed this out for me). Also added a "shopt -s extglob". (Thx to Chad)    #
 # Version 0.5: Line 162, fixed a typo (EXIT_UNKNOWN to STATE_UNKNOWN)         #
+# Version 0.7:                                                                #
+#    Line 191, modified sensor grab from "3rd section" to "after first '+'"   #
+#    Line 227-230, now checks if no sensor data was found and exits with      #
+#                  STATE_UNKNOWN                                              #
 ###############################################################################
 
-VERSION="Version 0.6"
+VERSION="Version 0.7"
 AUTHOR="(c) 2011 Jack-Benny Persson (jack-benny@cyberinfo.se)"
 
 # Sensor program
@@ -56,7 +60,7 @@ print_help()
 {
 	print_version
 	printf "$AUTHOR\n"
-	printf "Monitor temperatur with the use of sensors\n"
+	printf "Monitor temperature with the use of sensors\n"
 /bin/cat <<EOT
 
 Options:
@@ -184,10 +188,10 @@ fi
 
 
 #Get the temperature
-TEMP=`${SENSORPROG} | grep "$sensor Temp" | awk '{print $3}' | cut -c2-3`
+TEMP=`${SENSORPROG} | grep "$sensor" | cut -d+ -f2 | cut -c1-2 `
 
 
-# Check if the tresholds has been set correctly
+# Check if the thresholds have been set correctly
 if [[ -z "$thresh_warn" || -z "$thresh_crit" ]]; then
 	# One or both thresholds were not specified
 	printf "\nThreshold not set"
@@ -202,7 +206,7 @@ fi
 
 
 # Verbose output
-if [[ "$verbosity" -ge 2 ]]; then
+if [[ "$verbosity" -ge 1 ]]; then
    /bin/cat <<__EOT
 Debugging information:
   Warning threshold: $thresh_warn 
@@ -211,7 +215,7 @@ Debugging information:
   Current $sensor temperature: $TEMP
 __EOT
 printf "\n  Temperature lines directly from sensors:\n"
-${SENSORPROG} | grep "Temp"
+${SENSORPROG}
 printf "\n\n"
 fi
 
@@ -220,7 +224,12 @@ PERFDATA=`${SENSORPROG} | grep "$sensor"`
 
 
 # And finally check the temperature against our thresholds
-if [[ "$TEMP" -gt "$thresh_crit" ]]; then
+if [[ "$TEMP" != +([0-9]) ]]; then
+	# Temperature not found for that sensor
+	printf "No data found for that sensor ($sensor)\n"
+	exit $STATE_UNKNOWN
+	
+  elif [[ "$TEMP" -gt "$thresh_crit" ]]; then
 	# Temperature is above critical threshold
 	echo "$sensor CRITICAL - Temperature is $TEMP | $PERFDATA"
 	exit $STATE_CRITICAL
