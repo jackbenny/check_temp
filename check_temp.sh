@@ -24,13 +24,15 @@
 #                                                                             #	
 # Nagios plugin to monitor CPU and M/B temperature with sensors.              #
 # Written in Bash (and uses sed & awk).                                       #
-# Version 0.2: Line 98, fixed the missing "-n" option (Thanks to Chad who     #
+# Version 0.2: Line 103, fixed the missing "-n" option (Thanks to Chad who     #
 # pointed this out for me). Also added a "shopt -s extglob". (Thx to Chad)    #
-# Version 0.5: Line 162, fixed a typo (EXIT_UNKNOWN to STATE_UNKNOWN)         #
+# Version 0.5: Line 168, fixed a typo (EXIT_UNKNOWN to STATE_UNKNOWN)         #
 # Version 0.7:                                                                #
-#    Line 191, modified sensor grab from "3rd section" to "after first '+'"   #
-#    Line 227-230, now checks if no sensor data was found and exits with      #
-#                  STATE_UNKNOWN                                              #
+#    Line 193, modified sensor parsing to cut after the first '+' since all   #
+#        positive temperatures are preceded by a '+'                          #
+#    Line 211, reduced "verbosity" needed to see verbose info (was 2: -v -v)  #
+#    Line 229-232, now checks to see if no sensor data was found and          #
+#       exits with STATE_UNKNOWN                                              #
 ###############################################################################
 
 VERSION="Version 0.7"
