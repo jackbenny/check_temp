@@ -191,6 +191,8 @@ fi
 
 #Get the temperature
 TEMP=`${SENSORPROG} | grep "$sensor" | cut -d+ -f2 | cut -c1-2 `
+#Old way - Get the temperature
+#TEMP=`${SENSORPROG} | grep "$sensor" | awk '{print $3}' | cut -c2-3`
 
 
 # Check if the thresholds have been set correctly
