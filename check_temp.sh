@@ -24,7 +24,10 @@
 #                                                                             #	
 # Nagios plugin to monitor CPU and M/B temperature with sensors.              #
 # Written in Bash (and uses sed & awk).                                       #
-# Version 0.2: Line 103, fixed the missing "-n" option (Thanks to Chad who     #
+# Latest version of check_temp can be found at the below URL:                 #
+# https://bitbucket.org/jackbenny/check_temp                                  #
+#                                                                             #
+# Version 0.2: Line 103, fixed the missing "-n" option (Thanks to Chad who    #
 # pointed this out for me). Also added a "shopt -s extglob". (Thx to Chad)    #
 # Version 0.5: Line 168, fixed a typo (EXIT_UNKNOWN to STATE_UNKNOWN)         #
 # Version 0.7:                                                                #
