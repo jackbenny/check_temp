@@ -227,7 +227,7 @@ printf "\n\n"
 fi
 
 # Get performance data for Nagios "Performance Data" field
-PERFDATA=`${SENSORPROG} | grep "$sensor"`
+PERFDATA=`${SENSORPROG} | grep "$sensor" | head -n1`
 
 
 # And finally check the temperature against our thresholds
