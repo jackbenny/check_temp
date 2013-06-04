@@ -25,7 +25,7 @@
 # Nagios plugin to monitor CPU and M/B temperature with sensors.              #
 # Written in Bash (and uses sed & awk).                                       #
 # Latest version of check_temp can be found at the below URL:                 #
-# https://bitbucket.org/jackbenny/check_temp                                  #
+# https://github.com/jackbenny/check_temp                                     #
 #                                                                             #
 # If you are having problems getting it to work, check the instructions in    #
 # the README first. It walks you though install lm-sensors and getting it to  #
