@@ -27,6 +27,10 @@
 # Latest version of check_temp can be found at the below URL:                 #
 # https://bitbucket.org/jackbenny/check_temp                                  #
 #                                                                             #
+# If you are having problems getting it to work, check the instructions in    #
+# the README first. It walks you though install lm-sensors and getting it to  #
+# display sensor data.                                                        #
+#                                                                             #
 ###############################################################################
 
 VERSION="Version 0.8"
