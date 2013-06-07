@@ -5,11 +5,29 @@ It's written in Bash and uses *nix "sensors" and some sed & awk.
 Default is to check the CPU temperature but this can be changed to, for example, 
 the motherboard temperature with a "--sensor" argument. 
 The plugin complies with the guidelines, for example uses -w -c -v arguments 
-etc. It also does some basic sanity checks and has a exit 3 catchall.
+etc. It also does some basic sanity checks and has a exit 3 catch-all.
 
 The plugin was submitted to Nagios Exchange in 2011.
 
 Known forks of check_temp:
 There is a very good Perl fork of check_temp written by Chad Columbus. It's
-avalible on Nagios Exchange at
+available on Nagios Exchange at
 http://exchange.nagios.org/directory/Plugins/Operating-Systems/Linux/check_temp-2Epl/details
+
+Required:
+1) Install lm-sensors:
+  a) On Debian/Ubuntu... apt-get install lm-sensors
+
+2) Run sensors-detect:
+  sudo sensors-detect
+
+Let it check for any sensors that you feel are necessary, or all. You can just
+press <ENTER> to have it use the default option for each check. There is a
+warning in the manpages (man sensors-detect) that there are (some rare)
+hardware sensors that may lock up or even be permanently damaged, so be aware
+of that.
+ 
+3) Restart module-init-tools service
+  a) /etc/init.d/module-init-tools restart
+    or
+  b) service module-init-tools restart
