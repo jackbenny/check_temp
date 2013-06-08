@@ -17,6 +17,7 @@ http://exchange.nagios.org/directory/Plugins/Operating-Systems/Linux/check_temp-
 Required:
 1) Install lm-sensors:
   a) On Debian/Ubuntu... apt-get install lm-sensors
+  b) On OpenSUSE etc... zypper in sensors
 
 2) Run sensors-detect:
   sudo sensors-detect
@@ -27,7 +28,7 @@ warning in the manpages (man sensors-detect) that there are (some rare)
 hardware sensors that may lock up or even be permanently damaged, so be aware
 of that.
  
-3) Restart module-init-tools service
+3) Restart module-init-tools service (On Debian/Ubuntu)
   a) /etc/init.d/module-init-tools restart
     or
   b) service module-init-tools restart
