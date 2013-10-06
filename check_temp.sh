@@ -75,9 +75,9 @@ Options:
    Set what to monitor, for example CPU or MB (or M/B). Check sensors for the
    correct word. Default is CPU.
 -w INTEGER
-   Exit with WARNING status if above INTEGER degres
+   Exit with WARNING status if above INTEGER degrees
 -c INTEGER
-   Exit with CRITICAL status if above INTEGER degres
+   Exit with CRITICAL status if above INTEGER degrees
 EOT
 }
 
@@ -93,7 +93,7 @@ sensor=CPU
 
 # See if we have sensors program installed and can execute it
 if [[ ! -x "$SENSORPROG" ]]; then
-	printf "\nIt appears you don't have sensors installed in $SENSORPROG\n"
+	printf "\nIt appears you don't have lm-sensors installed in $SENSORPROG\n"
 	exit $STATE_UNKOWN
 fi
 
