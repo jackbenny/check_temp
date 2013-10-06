@@ -94,7 +94,7 @@ sensor=CPU
 # See if we have sensors program installed and can execute it
 if [[ ! -x "$SENSORPROG" ]]; then
 	printf "\nIt appears you don't have lm-sensors installed in $SENSORPROG\n"
-	exit $STATE_UNKOWN
+	exit $STATE_UNKNOWN
 fi
 
 # Parse command line options
