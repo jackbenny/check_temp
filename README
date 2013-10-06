@@ -27,6 +27,10 @@ press <ENTER> to have it use the default option for each check. There is a
 warning in the manpages (man sensors-detect) that there are (some rare)
 hardware sensors that may lock up or even be permanently damaged, so be aware
 of that.
+
+**********
+MAKE SURE YOU TYPE "YES" TO THE LAST OPTION: "Do you want to add these lines automatically to /etc/modules? (yes/NO)"
+**********
  
 3) Restart module-init-tools service (On Debian/Ubuntu)
   a) /etc/init.d/module-init-tools restart
