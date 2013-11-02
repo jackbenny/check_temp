@@ -33,7 +33,7 @@
 #                                                                             #
 ###############################################################################
 
-VERSION="Version 0.91"
+VERSION="Version 0.92"
 AUTHOR="(c) 2011 Jack-Benny Persson (jack-benny@cyberinfo.se)"
 
 # Sensor program
@@ -59,15 +59,15 @@ shopt -s extglob
 # Print version information
 print_version()
 {
-	printf "\n\n$0 - $VERSION\n"
+	echo "$0 - $VERSION"
 }
 
 #Print help information
 print_help()
 {
 	print_version
-	printf "$AUTHOR\n"
-	printf "Monitor temperature with the use of sensors\n"
+	echo "$AUTHOR"
+	echo "Monitor temperature with the use of sensors"
 /bin/cat <<EOT
 
 Options:
@@ -100,7 +100,7 @@ sensor=CPU
 
 # See if we have sensors program installed and can execute it
 if [[ ! -x "$SENSORPROG" ]]; then
-	printf "\nIt appears you don't have lm-sensors installed in $SENSORPROG\n"
+	echo "It appears you don't have lm-sensors installed in $SENSORPROG"
 	exit $STATE_UNKNOWN
 fi
 
@@ -126,7 +126,7 @@ while [[ -n "$1" ]]; do
        -w | --warning)
            if [[ -z "$2" ]]; then
                # Threshold not provided
-               printf "\nOption $1 requires an argument"
+               echo "Option $1 requires an argument"
                print_help
                exit $STATE_UNKNOWN
             elif [[ "$2" = +([0-9]) ]]; then
@@ -134,7 +134,7 @@ while [[ -n "$1" ]]; do
                thresh=$2
             else
                # Threshold is not an integer
-               printf "\nThreshold must be an integer"
+               echo "Threshold must be an integer"
                print_help
                exit $STATE_UNKNOWN
            fi
@@ -145,7 +145,7 @@ while [[ -n "$1" ]]; do
        -c | --critical)
            if [[ -z "$2" ]]; then
                # Threshold not provided
-               printf "\nOption '$1' requires an argument"
+               echo "Option '$1' requires an argument"
                print_help
                exit $STATE_UNKNOWN
             elif [[ "$2" = +([0-9]) ]]; then
@@ -153,7 +153,7 @@ while [[ -n "$1" ]]; do
                thresh=$2
             else
                # Threshold is not an integer
-               printf "\nThreshold must be an integer"
+               echo "Threshold must be an integer"
                print_help
                exit $STATE_UNKNOWN
            fi
@@ -168,7 +168,7 @@ while [[ -n "$1" ]]; do
 
        --sensor)
 	   if [[ -z "$2" ]]; then
-		printf "\nOption $1 requires an argument"
+		echo "Option $1 requires an argument"
 		print_help
 		exit $STATE_UNKNOWN
 	   fi
@@ -177,7 +177,7 @@ while [[ -n "$1" ]]; do
            ;;
 
        *)
-           printf "\nInvalid option '$1'"
+           echo "Invalid option '$1'"
            print_help
            exit $STATE_UNKNOWN
            ;;
@@ -188,7 +188,7 @@ done
 # Check if a sensor were specified
 if [[ -z "$sensor" ]]; then
 	# No sensor to monitor were specified
-	printf "\nNo sensor specified"
+	echo "No sensor specified"
 	print_help
 	exit $STATE_UNKNOWN
 fi
@@ -203,12 +203,12 @@ TEMP=`${SENSORPROG} | grep "$sensor" | cut -d+ -f2 | cut -c1-2 | head -n1`
 # Check if the thresholds have been set correctly
 if [[ -z "$thresh_warn" || -z "$thresh_crit" ]]; then
 	# One or both thresholds were not specified
-	printf "\nThreshold not set"
+	echo "Threshold not set"
 	print_help
 	exit $STATE_UNKNOWN
   elif [[ "$thresh_crit" -lt "$thresh_warn" ]]; then
 	# The warning threshold must be lower than the critical threshold
-	printf "\nWarning temperature should be lower than critical"
+	echo "Warning temperature should be lower than critical"
 	print_help
 	exit $STATE_UNKNOWN
 fi
@@ -223,9 +223,8 @@ Debugging information:
   Verbosity level: $verbosity
   Current $sensor temperature: $TEMP
 __EOT
-printf "\n  Temperature lines directly from sensors:\n"
+echo "Temperature lines directly from sensors:"
 ${SENSORPROG}
-printf "\n\n"
 fi
 
 # Get performance data for Nagios "Performance Data" field
@@ -235,7 +234,7 @@ PERFDATA=`${SENSORPROG} | grep "$sensor" | head -n1`
 # And finally check the temperature against our thresholds
 if [[ "$TEMP" != +([0-9]) ]]; then
 	# Temperature not found for that sensor
-	printf "No data found for that sensor ($sensor)\n"
+	echo "No data found for that sensor ($sensor) | $PERFDATA"
 	exit $STATE_UNKNOWN
 	
   elif [[ "$TEMP" -gt "$thresh_crit" ]]; then
@@ -253,4 +252,5 @@ if [[ "$TEMP" != +([0-9]) ]]; then
 	echo "$sensor OK - Temperature is $TEMP | $PERFDATA"
 	exit $STATE_OK
 fi
-exit 3
+
+exit $STATE_UNKNOWN
