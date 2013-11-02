@@ -33,17 +33,24 @@
 #                                                                             #
 ###############################################################################
 
-VERSION="Version 0.9"
+VERSION="Version 0.91"
 AUTHOR="(c) 2011 Jack-Benny Persson (jack-benny@cyberinfo.se)"
 
 # Sensor program
 SENSORPROG=/usr/bin/sensors
 
-# Exit codes
-STATE_OK=0
-STATE_WARNING=1
-STATE_CRITICAL=2
-STATE_UNKNOWN=3
+# Ryan's note: utils.sh is installed with nagios-plugins in with the plugins
+# Check if utils.sh exists. This lets you use check_domain in a testing environment
+# or outside of Nagios.
+if [ -e "$PROGPATH/utils.sh" ]; then
+	. "$PROGPATH/utils.sh"
+else
+	STATE_OK=0
+	STATE_WARNING=1
+	STATE_CRITICAL=2
+	STATE_UNKNOWN=3
+#	STATE_DEPENDENT=4    (Commented because it's unused.)
+fi
 
 shopt -s extglob
 
