@@ -37,7 +37,7 @@ VERSION="Version 0.93"
 AUTHOR="(c) 2011 Jack-Benny Persson (jack-benny@cyberinfo.se)"
 
 # Sensor program
-SENSORPROG=$(whereis -b -B /{bin,usr,etc}/* -f sensors | awk '{print $2}')
+SENSORPROG=$(whereis -b -B /{bin,sbin,usr,etc} /{bin,sbin,usr,etc}/* -f sensors | awk '{print $2}')
 
 # Ryan's note: utils.sh is installed with nagios-plugins in with the plugins
 # Check if utils.sh exists. This lets you use check_domain in a testing environment
