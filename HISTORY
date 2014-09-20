@@ -17,3 +17,9 @@ Version 0.8:
      sensors output. On some machine you get two Core0 and two Core1 temps.
    Moved version history to it's own file, HISTORY
 
+Version 0.94:
+    Lots of changes and bugfixes. A huge thank you to Ryan Loudfoot who
+    has fixed bugs and worked out a new way to detect the sensors-program.
+    In 0.94 I removed /etc from the whereis path as it didn't work for me
+    on my setup. It found the config-file for lm-sensors and tried to run
+    it.
