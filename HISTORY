@@ -23,3 +23,7 @@ Version 0.94:
     In 0.94 I removed /etc from the whereis path as it didn't work for me
     on my setup. It found the config-file for lm-sensors and tried to run
     it.
+
+Version 0.95:
+    Changed the Performance Data Field to only contain a label and the
+    actual value in celsius. For example "temperature=39".
