@@ -194,8 +194,9 @@ if [[ -z "$sensor" ]]; then
 fi
 
 
-#Get the temperature
-TEMP=`${SENSORPROG} | grep "$sensor" | cut -d+ -f2 | cut -c1-2 | head -n1`
+# Get the temperature
+# Grep the first float with a plus sign and keep only the integer
+TEMP=`${SENSORPROG} | grep "$sensor" | head -n1 | grep -o "+[0-9]\+\(.[0-9]\+\)\?" | head -n1 | tr -d '+' | cut -d. -f1`
 #Old way - Get the temperature
 #TEMP=`${SENSORPROG} | grep "$sensor" | awk '{print $3}' | cut -c2-3 | head -n1`
 
