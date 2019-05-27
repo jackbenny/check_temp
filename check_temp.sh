@@ -229,7 +229,7 @@ ${SENSORPROG}
 fi
 
 # Get performance data for Nagios "Performance Data" field
-PERFDATA="temperature=$TEMP"
+PERFDATA="$sensor=$TEMP;$thresh_warn;$thresh_crit"
 
 
 # And finally check the temperature against our thresholds
