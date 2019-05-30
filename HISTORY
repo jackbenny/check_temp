@@ -26,4 +26,11 @@ Version 0.94:
 
 Version 0.95:
     Changed the Performance Data Field to only contain a label and the
-    actual value in celsius. For example "temperature=39".
+    actual value in celsius. For example, "temperature=39".
+
+Version 1.0:
+    Several improvements made by Nikodimos, including:
+     - Added support for multiple sensors
+     - Enriched performance data output. For example, "CPU=34;40;55 MB=32;40;55"
+     - Changed (and improved) the way temperatures are retrieved
+     - Other fixes and touch-ups, such as the help text now shows long options

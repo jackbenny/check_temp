@@ -33,7 +33,7 @@
 #                                                                             #
 ###############################################################################
 
-VERSION="Version 0.94"
+VERSION="Version 1.0"
 AUTHOR="(c) 2011 Jack-Benny Persson (jack-benny@cyberinfo.se)"
 
 # Sensor program
