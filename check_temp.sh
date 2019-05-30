@@ -71,20 +71,28 @@ print_help()
 /bin/cat <<EOT
 
 Options:
--h
+-h, --help
    Print detailed help screen
--V
+-V, --version
    Print version information
--v
+-v, --verbose
    Verbose output
 
---sensor WORD
+-s, --sensor <WORD[,DISPLAY_NAME]>
    Set what to monitor, for example CPU or MB (or M/B). Check sensors for the
-   correct word. Default is CPU.
--w INTEGER
+   correct word. Default is CPU. A different display name can be used in output,
+   by adding it next to sensor with a comma.
+   It can be used more than once, with different warning/critical thresholds optionally.
+-w, --warning <INTEGER>
    Exit with WARNING status if above INTEGER degrees
--c INTEGER
+-c, --critical <INTEGER>
    Exit with CRITICAL status if above INTEGER degrees
+   Warning and critical thresholds must be provided before the corresponding --sensor option.
+
+Examples:
+./check_temp.sh -w 65 -c 75 --sensor CPU
+./check_temp.sh -w 65 -c 75 --sensor CPU --sensor temp1
+./check_temp.sh -w 65 -c 75 --sensor CPU -w 75 -c 85 --sensor temp1,GPU
 EOT
 }
 
@@ -96,13 +104,85 @@ thresh_warn=
 # Critical threshold
 thresh_crit=
 # Hardware to monitor
-sensor=CPU
+default_sensor="CPU"
+sensor_declared=false
+
+STATE=$STATE_OK
 
 # See if we have sensors program installed and can execute it
 if [[ ! -x "$SENSORPROG" ]]; then
 	echo "It appears you don't have lm-sensors installed. You may find help in the readme for this script."
 	exit $STATE_UNKNOWN
 fi
+
+function set_state {
+	[[ "$STATE" -lt "$1" ]] && STATE=$1 
+}
+
+function process_sensor {
+	sensor=$(echo $1 | cut -d, -f1)
+	sensor_display=$(echo $1 | cut -d, -f2)
+	# Check if a sensor were specified
+	if [[ -z "$sensor" ]]; then
+		# No sensor to monitor were specified
+		echo "No sensor specified"
+		print_help
+		exit $STATE_UNKNOWN
+	fi
+
+	# Check if the thresholds have been set correctly
+	if [[ -z "$thresh_warn" || -z "$thresh_crit" ]]; then
+		# One or both thresholds were not specified
+		echo "Threshold not set"
+		print_help
+		exit $STATE_UNKNOWN
+	  elif [[ "$thresh_crit" -lt "$thresh_warn" ]]; then
+		# The warning threshold must be lower than the critical threshold
+		echo "Warning temperature should be lower than critical"
+		print_help
+		exit $STATE_UNKNOWN
+	fi
+	# Get the temperature
+	# Grep the first float with a plus sign and keep only the integer
+	WHOLE_TEMP=$(${SENSORPROG} | grep "$sensor" | head -n1 | grep -o "+[0-9]\+\(\.[0-9]\+\)\?[^ \t,()]*" | head -n1)
+	TEMPF=$(echo "$WHOLE_TEMP" | grep -o "[0-9]\+\(\.[0-9]\+\)\?")
+	TEMP=$(echo "$TEMPF" | cut -d. -f1)
+
+	# Verbose output
+	if [[ "$verbosity" -ge 1 ]]; then
+	   /bin/cat <<__EOT
+	Debugging information:
+	  Warning threshold: $thresh_warn 
+	  Critical threshold: $thresh_crit
+	  Verbosity level: $verbosity
+	  Current $sensor temperature: $TEMP
+__EOT
+	echo "Temperature lines directly from sensors:"
+	${SENSORPROG}
+	fi
+	
+	# Get performance data for Nagios "Performance Data" field
+	PERFDATA="$PERFDATA $sensor_display=$TEMP;$thresh_warn;$thresh_crit"
+
+	# And finally check the temperature against our thresholds
+	if [[ "$TEMP" != +([0-9]) ]]; then
+		# Temperature not found for that sensor
+		OUTPUT_TEXT="$OUTPUT_TEXT, No data found for sensor ($sensor)"
+		set_state $STATE_UNKNOWN
+	elif [[ "$TEMP" -gt "$thresh_crit" ]]; then
+		# Temperature is above critical threshold
+		OUTPUT_TEXT="$OUTPUT_TEXT, $sensor_display has temperature: $WHOLE_TEMP"
+		set_state $STATE_CRITICAL
+	elif [[ "$TEMP" -gt "$thresh_warn" ]]; then
+		# Temperature is above warning threshold
+		OUTPUT_TEXT="$OUTPUT_TEXT, $sensor_display has temperature: $WHOLE_TEMP"
+		set_state $STATE_WARNING
+	else
+		# Temperature is ok
+		OUTPUT_TEXT="$OUTPUT_TEXT, $sensor_display has temperature: $WHOLE_TEMP"
+		set_state $STATE_OK
+	fi
+}
 
 # Parse command line options
 while [[ -n "$1" ]]; do 
@@ -161,18 +241,14 @@ while [[ -n "$1" ]]; do
 	   shift 2
            ;;
 
-       -\?)
-           print_help
-           exit $STATE_OK
-           ;;
-
-       --sensor)
+       -s | --sensor)
 	   if [[ -z "$2" ]]; then
 		echo "Option $1 requires an argument"
 		print_help
 		exit $STATE_UNKNOWN
 	   fi
-		sensor=$2
+	   sensor_declared=true
+	   process_sensor $2
            shift 2
            ;;
 
@@ -184,73 +260,17 @@ while [[ -n "$1" ]]; do
    esac
 done
 
-
-# Check if a sensor were specified
-if [[ -z "$sensor" ]]; then
-	# No sensor to monitor were specified
-	echo "No sensor specified"
-	print_help
-	exit $STATE_UNKNOWN
+if [ "$sensor_declared" = false ]; then
+	process_sensor "$default_sensor"
 fi
 
+case "$STATE" in
+	"$STATE_OK") STATE_TEXT="OK" ;;
+	"$STATE_WARNING") STATE_TEXT="WARNING" ;;
+	"$STATE_CRITICAL") STATE_TEXT="CRITICAL" ;;
+	"$STATE_UNKNOWN") STATE_TEXT="UNKNOWN" ;;
+esac
 
-#Get the temperature
-TEMP=`${SENSORPROG} | grep "$sensor" | cut -d+ -f2 | cut -c1-2 | head -n1`
-#Old way - Get the temperature
-#TEMP=`${SENSORPROG} | grep "$sensor" | awk '{print $3}' | cut -c2-3 | head -n1`
-
-
-# Check if the thresholds have been set correctly
-if [[ -z "$thresh_warn" || -z "$thresh_crit" ]]; then
-	# One or both thresholds were not specified
-	echo "Threshold not set"
-	print_help
-	exit $STATE_UNKNOWN
-  elif [[ "$thresh_crit" -lt "$thresh_warn" ]]; then
-	# The warning threshold must be lower than the critical threshold
-	echo "Warning temperature should be lower than critical"
-	print_help
-	exit $STATE_UNKNOWN
-fi
-
-
-# Verbose output
-if [[ "$verbosity" -ge 1 ]]; then
-   /bin/cat <<__EOT
-Debugging information:
-  Warning threshold: $thresh_warn 
-  Critical threshold: $thresh_crit
-  Verbosity level: $verbosity
-  Current $sensor temperature: $TEMP
-__EOT
-echo "Temperature lines directly from sensors:"
-${SENSORPROG}
-fi
-
-# Get performance data for Nagios "Performance Data" field
-PERFDATA="temperature=$TEMP"
-
-
-# And finally check the temperature against our thresholds
-if [[ "$TEMP" != +([0-9]) ]]; then
-	# Temperature not found for that sensor
-	echo "No data found for that sensor ($sensor) | $PERFDATA"
-	exit $STATE_UNKNOWN
-	
-  elif [[ "$TEMP" -gt "$thresh_crit" ]]; then
-	# Temperature is above critical threshold
-	echo "$sensor CRITICAL - Temperature is $TEMP | $PERFDATA"
-	exit $STATE_CRITICAL
-
-  elif [[ "$TEMP" -gt "$thresh_warn" ]]; then
-	# Temperature is above warning threshold
-	echo "$sensor WARNING - Temperature is $TEMP | $PERFDATA"
-	exit $STATE_WARNING
-
-  else
-	# Temperature is ok
-	echo "$sensor OK - Temperature is $TEMP | $PERFDATA"
-	exit $STATE_OK
-fi
-
-exit $STATE_UNKNOWN
+OUTPUT_TEXT=$(echo $OUTPUT_TEXT | sed -e 's/, //')
+echo "TEMPERATURE $STATE_TEXT - $OUTPUT_TEXT |$PERFDATA"
+exit $STATE
