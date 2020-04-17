@@ -248,7 +248,7 @@ while [[ -n "$1" ]]; do
 		exit $STATE_UNKNOWN
 	   fi
 	   sensor_declared=true
-	   process_sensor $2
+	   process_sensor "$2"
            shift 2
            ;;
 
