@@ -33,8 +33,8 @@
 #                                                                             #
 ###############################################################################
 
-VERSION="Version 1.0"
-AUTHOR="(c) 2011 Jack-Benny Persson (jack-benny@cyberinfo.se)"
+VERSION="Version 1.1"
+AUTHOR="(c) 2011 Jack-Benny Persson (jack-benny@cyberinfo.se), (c) 2020 Onkobu Tanaake (oss@onkobutanaake.de)"
 
 # Sensor program
 SENSORPROG=$(whereis -b -B /{bin,sbin,usr} /{bin,sbin,usr}/* -f sensors | awk '{print $2}')
@@ -144,7 +144,7 @@ function process_sensor {
 	fi
 	# Get the temperature
 	# Grep the first float with a plus sign and keep only the integer
-	WHOLE_TEMP=$(${SENSORPROG} | grep "$sensor" | head -n1 | grep -o "+[0-9]\+\(\.[0-9]\+\)\?[^ \t,()]*" | head -n1)
+	WHOLE_TEMP=$(${SENSORPROG} -A "$sensor" | sed -n '2 p' | grep -o "+[0-9]\+\(\.[0-9]\+\)\?[^ \t,()]*" | head -n1)
 	TEMPF=$(echo "$WHOLE_TEMP" | grep -o "[0-9]\+\(\.[0-9]\+\)\?")
 	TEMP=$(echo "$TEMPF" | cut -d. -f1)
 
@@ -248,7 +248,7 @@ while [[ -n "$1" ]]; do
 		exit $STATE_UNKNOWN
 	   fi
 	   sensor_declared=true
-	   process_sensor "$2"
+	   sensors_to_check="$2"
            shift 2
            ;;
 
@@ -262,6 +262,8 @@ done
 
 if [ "$sensor_declared" = false ]; then
 	process_sensor "$default_sensor"
+else
+	process_sensor "$sensors_to_check"
 fi
 
 case "$STATE" in

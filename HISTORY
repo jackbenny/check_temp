@@ -34,3 +34,8 @@ Version 1.0:
      - Enriched performance data output. For example, "CPU=34;40;55 MB=32;40;55"
      - Changed (and improved) the way temperatures are retrieved
      - Other fixes and touch-ups, such as the help text now shows long options
+
+Version 1.1:
+	Improvements for Icinga 2, made by Onkobu
+	 - order of arguments is irrelevant now, --sensor first ignored following -c & -w
+	 - current sensors' multiline output needs sophisticated treatment
