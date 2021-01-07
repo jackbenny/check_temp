@@ -279,9 +279,6 @@ while [[ -n "$1" ]]; do
 	else
 		process_sensor "$sensors_to_check"
 	fi
-	unset thresh_crit
-	unset thresh_warn
-	unset sensors_to_check
    fi
 done
 
