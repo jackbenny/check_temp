@@ -33,8 +33,8 @@
 #                                                                             #
 ###############################################################################
 
-VERSION="Version 1.0"
-AUTHOR="(c) 2011 Jack-Benny Persson (jack-benny@cyberinfo.se)"
+VERSION="Version 1.1"
+AUTHOR="(c) 2011 Jack-Benny Persson (jack-benny@cyberinfo.se), (c) 2020 Onkobu Tanaake (oss@onkobutanaake.de)"
 
 # Sensor program
 SENSORPROG=$(whereis -b -B /{bin,sbin,usr} /{bin,sbin,usr}/* -f sensors | awk '{print $2}')
@@ -88,11 +88,13 @@ Options:
 -c, --critical <INTEGER>
    Exit with CRITICAL status if above INTEGER degrees
    Warning and critical thresholds must be provided before the corresponding --sensor option.
+-n
+   Use the new sed based filter in case classic filter yields no temperature.
 
 Examples:
-./check_temp.sh -w 65 -c 75 --sensor CPU
-./check_temp.sh -w 65 -c 75 --sensor CPU --sensor temp1
-./check_temp.sh -w 65 -c 75 --sensor CPU -w 75 -c 85 --sensor temp1,GPU
+./check_temp.sh [-n] -w 65 -c 75 --sensor CPU
+./check_temp.sh [-n] -w 65 -c 75 --sensor CPU --sensor temp1
+./check_temp.sh [-n] -w 65 -c 75 --sensor CPU -w 75 -c 85 --sensor temp1,GPU
 EOT
 }
 
@@ -144,7 +146,11 @@ function process_sensor {
 	fi
 	# Get the temperature
 	# Grep the first float with a plus sign and keep only the integer
-	WHOLE_TEMP=$(${SENSORPROG} | grep "$sensor" | head -n1 | grep -o "+[0-9]\+\(\.[0-9]\+\)\?[^ \t,()]*" | head -n1)
+	if [ $CLASSIC_FILTER -eq 1 ]; then
+		WHOLE_TEMP=$(${SENSORPROG} | grep "$sensor" | head -n1 | grep -o "+[0-9]\+\(\.[0-9]\+\)\?[^ \t,()]*" | head -n1)
+	else
+		WHOLE_TEMP=$(${SENSORPROG} -A "$sensor" | sed -n '2 p' | grep -o "+[0-9]\+\(\.[0-9]\+\)\?[^ \t,()]*" | head -n1)
+	fi
 	TEMPF=$(echo "$WHOLE_TEMP" | grep -o "[0-9]\+\(\.[0-9]\+\)\?")
 	TEMP=$(echo "$TEMPF" | cut -d. -f1)
 
@@ -183,6 +189,8 @@ __EOT
 		set_state $STATE_OK
 	fi
 }
+
+CLASSIC_FILTER=1
 
 # Parse command line options
 while [[ -n "$1" ]]; do 
@@ -248,21 +256,32 @@ while [[ -n "$1" ]]; do
 		exit $STATE_UNKNOWN
 	   fi
 	   sensor_declared=true
-	   process_sensor "$2"
+	   sensors_to_check="$2"
            shift 2
            ;;
 
+	   -n | --new-filter)
+		   CLASSIC_FILTER=0
+		   shift 1
+		   ;;
        *)
            echo "Invalid option '$1'"
            print_help
            exit $STATE_UNKNOWN
            ;;
    esac
+
+   # argument order is irrelevant, Icinga2 gives no guarantees
+   # as soon as there are enough output is generated
+   if [ ! -z "$thresh_warn" ] && [ ! -z "$thresh_crit" ] && [ ! -z "$sensors_to_check" -o $# -eq 0 ]; then
+	if [ "$sensor_declared" = false ]; then
+		process_sensor "$default_sensor"
+	else
+		process_sensor "$sensors_to_check"
+	fi
+   fi
 done
 
-if [ "$sensor_declared" = false ]; then
-	process_sensor "$default_sensor"
-fi
 
 case "$STATE" in
 	"$STATE_OK") STATE_TEXT="OK" ;;
