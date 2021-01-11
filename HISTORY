@@ -39,3 +39,8 @@ Version 1.1:
 	Improvements for Icinga 2, made by Onkobu
 	 - order of arguments is irrelevant now, --sensor first ignored following -c & -w
 	 - current sensors' multiline output needs sophisticated treatment
+
+Version 1.2:
+   Improvements for Icinga 2, made by Onkobu
+   - Added the ability to switch between old and new style with an -n option
+   - Fixed multi-sensor with identical thresholds
