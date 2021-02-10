@@ -39,3 +39,11 @@ Version 1.1:
 	Improvements for Icinga 2, made by Onkobu
 	 - order of arguments is irrelevant now, --sensor first ignored following -c & -w
 	 - current sensors' multiline output needs sophisticated treatment
+
+Version 1.2:
+	Fixes for multi sensor, made by Onkobu
+	 - each sensor appears exactly once in message and in performance metrics
+	Test infrastructure
+	 - some Bash scripts and sample output mocking sensors' output
+	 - outlined some terms (device, adapter, sensor) in README
+	 - short explanation how to add tests in README
