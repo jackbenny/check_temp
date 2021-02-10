@@ -33,7 +33,7 @@
 #                                                                             #
 ###############################################################################
 
-VERSION="Version 1.1"
+VERSION="Version 1.2"
 AUTHOR="(c) 2011 Jack-Benny Persson (jack-benny@cyberinfo.se), (c) 2020 Onkobu Tanaake (oss@onkobutanaake.de)"
 
 # Sensor program
@@ -112,7 +112,9 @@ sensor_declared=false
 STATE=$STATE_OK
 
 # See if we have sensors program installed and can execute it
-if [[ ! -x "$SENSORPROG" ]]; then
+if [ $SENSORPROG = 'sensors' ] && [ "$(LC_ALL=C type -t $SENSORPROG)" = "function" ]; then
+	echo "!!! TEST MODE !!!"
+elif [[ ! -x "$SENSORPROG" ]]; then
 	echo "It appears you don't have lm-sensors installed. You may find help in the readme for this script."
 	exit $STATE_UNKNOWN
 fi
@@ -278,7 +280,10 @@ while [[ -n "$1" ]]; do
 		process_sensor "$default_sensor"
 	else
 		process_sensor "$sensors_to_check"
+		unset sensors_to_check
 	fi
+	unset thresh_warn
+	unset thresh_crit
    fi
 done
 

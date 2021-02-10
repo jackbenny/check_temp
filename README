@@ -1,6 +1,6 @@
-check_temp
+# check_temp
 
-A small Nagios plugin that checks the CPU (or M/B) temperature with lm-sensors.
+A small Nagios/Icinga plugin that checks the CPU (or M/B) temperature with lm-sensors.
 It's written in Bash and uses *nix "sensors" and some sed & awk.
 Default is to check the CPU temperature but this can be changed to, for example, 
 the motherboard temperature with a "--sensor" argument. 
@@ -14,7 +14,7 @@ There is a very good Perl fork of check_temp written by Chad Columbus. It's
 available on Nagios Exchange at
 http://exchange.nagios.org/directory/Plugins/Operating-Systems/Linux/check_temp-2Epl/details
 
-Required:
+## Required
 1) Install lm-sensors:
   a) On Debian/Ubuntu... apt-get install lm-sensors
   b) On OpenSUSE etc... zypper in sensors
@@ -36,3 +36,65 @@ MAKE SURE YOU TYPE "YES" TO THE LAST OPTION: "Do you want to add these lines aut
   a) /etc/init.d/module-init-tools restart
     or
   b) service module-init-tools restart
+
+# Sensor 101
+
+The output normally has a set of one or more blocks. This totally depends
+on your hardware, available and loaded modules. A single block looks like
+the following:
+
+```
+k10temp-pci-00c3
+Adapter: PCI adapter
+temp1:        +45.2°C  (high = +70.0°C)
+                       (crit = +105.0°C, hyst = +97.5°C)
+```
+
+The first line is the label and represents a device. As shown above the
+device is named "k10temp-pci-00c3". The second line can be suppressed
+with `sensors -A`. It represents the type of adapter of the device. 
+Each device has at least one sensor. In the above case the sensor name is
+temp1. 
+
+There can be other devices like a laptop battery. It could have only
+a single sensor and it shows the battery's current voltage. A more complex
+example with a battery a GPU and a CPU:
+
+```
+BAT1-acpi-0
+in0:          15.54 V  
+
+radeon-pci-0008
+temp1:        +45.5°C  (crit = +120.0°C, hyst = +90.0°C)
+
+k10temp-pci-00c3
+temp1:        +44.1°C  (high = +70.0°C)
+                       (crit = +105.0°C, hyst = +97.5°C)
+```
+
+This sample shows a quite common issue of `--sensor` without
+`-n`: temp1 is not unique and the first occurence will become the
+input for the monitoring system.
+
+# Tests
+
+Under "tests" is a script `run_tests.sh` that executes all test scripts in
+random order. Each test script comes with a mocked output of sensors. It
+plays tricks on `check_temp.sh`. It is not necessary to instrument any
+binary nor `sudo` or symbolic links.
+
+To create your test case:
+
+1. Think of a good name for the use case the tests will assert, e.g. "new_filter"
+1. Redirect the output to a data file: `sensors >tests/data/sample_new_filter`
+1. copy one of the existing tests that suits your needs best, e.g. `test_new_filter.sh`
+1. edit the skeleton to invoke check_temp.sh with the necessary parameters
+1. file a pull request to outline the problem with the newly added test code
+
+The common case is check_temp.sh without the -n switch which invokes sensors
+command without any parameters. Use TESTDATA and a single file as mocked
+sensors output.
+
+If you intend to test with -n switch instead use TESTDATA_PREFIX. Each device
+specified with --sensor is mapped to the mock file TESTDATA_PREFIX-<sensor>.
+The test script `test_new_filter.sh` illustrates this.

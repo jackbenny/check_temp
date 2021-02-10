@@ -1,0 +1,13 @@
+# A basic test with the default sensor CPU. It is very important
+# to not repeat the sensor name in the first line of the output.
+# Only the first occurance of the sensor name is taken apart for
+# temperature values
+#
+A fancy output
+Adapter: PCI adapter
+first:        +34.1°C  (high = +70.0°C)
+                     (crit = +105.0°C, hyst = +97.5°C)A fancy output
+Another Line
+Adapter: PCI adapter
+second:        +45.1°C  (high = +70.0°C)
+                     (crit = +105.0°C, hyst = +97.5°C)

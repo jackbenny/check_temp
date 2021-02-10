@@ -1,0 +1,9 @@
+# The -n switch forces sensors to output only the specific
+# device instead of filtering for the sensor line. Thus temp1
+# does not appear anywhere, not in the stats, not in the parameter
+# list.
+#
+k10temp-pci-00c3
+temp1:        +45.2°C  (high = +70.0°C)
+                       (crit = +105.0°C, hyst = +97.5°C)
+
