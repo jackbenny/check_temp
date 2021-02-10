@@ -41,9 +41,15 @@ Version 1.1:
 	 - current sensors' multiline output needs sophisticated treatment
 
 Version 1.2:
+   Improvements for Icinga 2, made by Onkobu
+   - Added the ability to switch between old and new style with an -n option
+   - Fixed multi-sensor with identical thresholds
+
+Version 1.3:
 	Fixes for multi sensor, made by Onkobu
 	 - each sensor appears exactly once in message and in performance metrics
 	Test infrastructure
 	 - some Bash scripts and sample output mocking sensors' output
 	 - outlined some terms (device, adapter, sensor) in README
 	 - short explanation how to add tests in README
+

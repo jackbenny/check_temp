@@ -33,7 +33,7 @@
 #                                                                             #
 ###############################################################################
 
-VERSION="Version 1.2"
+VERSION="Version 1.3"
 AUTHOR="(c) 2011 Jack-Benny Persson (jack-benny@cyberinfo.se), (c) 2020 Onkobu Tanaake (oss@onkobutanaake.de)"
 
 # Sensor program
